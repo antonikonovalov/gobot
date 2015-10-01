@@ -96,7 +96,13 @@ func build(j *job, gopath string) error {
 
 func goget(gopath, pkg string) ([]byte, error) {
 	cmd := exec.Command("go", "get", pkg)
-	cmd.Env = append(os.Environ(), "GOPATH="+gopath)
+	for _, env := range os.Environ() {
+		if strings.Contains(env,"GOPATH=") {
+			env = "GOPATH="+gopath
+		}
+		cmd.Env = append(cmd.Env,env)
+	}
+
 	return cmd.CombinedOutput()
 }
 
