@@ -53,7 +53,7 @@ func handleBuild(w http.ResponseWriter, r *http.Request) {
 		insecure = true
 	}
 	j := &job{
-		insecure: insecure
+		insecure: insecure,
 		pkg:  r.URL.Path,
 		tar:  http.MaxBytesReader(w, r.Body, MaxTarSize),
 		done: make(chan struct{}),
