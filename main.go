@@ -105,7 +105,7 @@ func build(j *job, gopath string) error {
 func goget(gopath, pkg string,insecure bool) ([]byte, error) {
 	var cmd *exec.Cmd
 	if insecure {
-		cmd = exec.Command("go", "get", "-insecure", pkg)
+		cmd = exec.Command("go", "get", "-v","-insecure", pkg)
 	} else {
 		cmd = exec.Command("go", "get", pkg)
 	}	
