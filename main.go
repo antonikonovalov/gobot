@@ -46,7 +46,14 @@ func handleInfo(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleBuild(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+	var insecure bool
+	rawInsecure := r.FormValue("insecure")
+	if rawInsecure != "" && rawInsecure == "true" {
+		insecure = true
+	}
 	j := &job{
+		insecure: insecure
 		pkg:  r.URL.Path,
 		tar:  http.MaxBytesReader(w, r.Body, MaxTarSize),
 		done: make(chan struct{}),
@@ -87,7 +94,11 @@ func build(j *job, gopath string) error {
 	if err != nil {
 		return err
 	}
-	j.out, err = goget(gopath, j.pkg)
+	cmdPkg := j.pkg
+	if j.insecure {
+		cmdPkg = " -insecure " + j.pkg
+	}
+	j.out, err = goget(gopath, cmdPkg)
 	if err != nil {
 		return err
 	}
@@ -114,6 +125,7 @@ type job struct {
 	bin    *os.File
 	out    []byte
 	err    error
+	insecure bool
 	done   chan struct{}
 }
 
