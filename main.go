@@ -94,11 +94,7 @@ func build(j *job, gopath string) error {
 	if err != nil {
 		return err
 	}
-	cmdPkg := j.pkg
-	if j.insecure {
-		cmdPkg = " -insecure " + j.pkg
-	}
-	j.out, err = goget(gopath, cmdPkg)
+	j.out, err = goget(gopath, j.pkg,j.insecure)
 	if err != nil {
 		return err
 	}
@@ -106,8 +102,13 @@ func build(j *job, gopath string) error {
 	return err
 }
 
-func goget(gopath, pkg string) ([]byte, error) {
-	cmd := exec.Command("go", "get", pkg)
+func goget(gopath, pkg string,insecure bool) ([]byte, error) {
+	var cmd *exec.Cmd
+	if insecure {
+		cmd = exec.Command("go", "get", "-insecure", pkg)
+	} else {
+		cmd = exec.Command("go", "get", pkg)
+	}	
 	for _, env := range os.Environ() {
 		if strings.Contains(env,"GOPATH=") {
 			env = "GOPATH="+gopath
